@@ -1,79 +1,80 @@
-.App {
-  text-align: center;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for backdrop blur and glass effect */
+.backdrop-blur-lg {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
 }
 
-.tabs {
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: 20px;
+/* Gradient animations */
+.bg-gradient-to-br {
+    background-size: 200% 200%;
+    animation: gradientMovement 10s ease infinite;
 }
 
-button {
-  padding: 10px 20px;
-  cursor: pointer;
-  border: none;
-  background-color: #f0f0f0;
-  font-weight: bold;
+@keyframes gradientMovement {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
-button.active {
-  background-color: #007bff;
-  color: #fff;
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
 }
 
-input {
-  padding: 10px;
-  width: calc(100% - 22px);
-  margin-bottom: 10px;
-  box-sizing: border-box;
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
 }
 
-.tab-content {
-  margin-top: 20px;
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
 }
 
-.image-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-top: 20px;
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
-img {
-  width: 100%;
-  height: auto;
-  border: 2px solid #ccc;
-  border-radius: 5px;
+/* Focus styles */
+*:focus {
+    outline: none;
+    ring: 2px solid rgba(59, 130, 246, 0.5);
 }
 
-.empty-image-slot {
-  width: 100%;
-  height: 0;
-  padding-bottom: 75%; /* Maintain aspect ratio for empty slots */
-  border: 2px dashed #ccc;
-  border-radius: 5px;
-  background-color: #f9f9f9;
+/* Smooth transitions */
+button, input, textarea {
+    transition: all 0.2s ease-in-out;
 }
 
-.output {
-  margin-top: 20px;
-  text-align: left;
-  background-color: #f4f4f4;
-  padding: 10px;
-  border-radius: 5px;
+/* Placeholder text color */
+::placeholder {
+    color: rgba(191, 219, 254, 0.6);
 }
 
-.recipe-text {
-  max-width: 100%; /* Adjust based on your specific layout needs */
-  padding: 10px;
-  box-sizing: border-box; /* Ensures padding is included in width calculation */
-  word-wrap: break-word;
-  overflow-y: auto; /* Allows scrolling for excessive text */
-  font-size: calc(12px + 0.5vw); /* Responsive font size */
-  line-height: 1.6; /* Improves readability */
-  border: 1px solid #ccc; /* Optional: adds a border around the text container */
-  margin-bottom: 20px; /* Spacing below the text container */
+/* Base styles for better text readability */
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+}
+
+/* Ensure pre tags wrap text properly */
+pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
