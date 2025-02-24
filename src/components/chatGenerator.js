@@ -2,12 +2,11 @@ import React, { useState, useEffect } from "react";
 
 function ChatGenerator() {
     const [prompt, setPrompt] = useState('');
-    const [conversation, setConversation] = useState([]); // Stores current conversation
-    const [chatHistory, setChatHistory] = useState([]); // Stores past conversations
+    const [conversation, setConversation] = useState([]);
+    const [chatHistory, setChatHistory] = useState([]);
     const [loading, setLoading] = useState(false);
     const [showHistory, setShowHistory] = useState(false);
 
-    // Fetch saved conversations when the component loads
     useEffect(() => {
         fetchChatHistory();
     }, []);
@@ -16,7 +15,7 @@ function ChatGenerator() {
         try {
             const response = await fetch("http://localhost:8080/chatHistory");
             const data = await response.json();
-            setChatHistory(data.map(conv => JSON.parse(conv.messages))); // Parse JSON conversations
+            setChatHistory(data.map(conv => JSON.parse(conv.messages)));
         } catch (error) {
             console.error("Error fetching chat history:", error);
         }
@@ -29,7 +28,6 @@ function ChatGenerator() {
             const response = await fetch(`http://localhost:8080/response?message=${encodeURIComponent(prompt)}`);
             const data = await response.text();
 
-            // Update conversation state with new message-response pair
             setConversation([...conversation, { user: prompt, bot: data }]);
             setPrompt('');
         } catch (error) {
@@ -41,15 +39,15 @@ function ChatGenerator() {
     const saveConversation = async () => {
         await fetch("http://localhost:8080/saveConversation", { method: "GET" });
         alert("Conversation saved!");
-        setConversation([]); // Clear chat after saving
-        fetchChatHistory(); // Refresh history
+        setConversation([]);
+        fetchChatHistory();
     };
 
     return (
         <div className="chat-container text-white p-6 bg-white/10 backdrop-blur-lg rounded-lg shadow-md">
             <h1 className="text-2xl font-semibold mb-4">Chat Bot</h1>
 
-            {/* Toggle Chat History View */}
+            {}
             <button
                 onClick={() => setShowHistory(!showHistory)}
                 className="w-full bg-blue-600 text-white py-2 mb-4 rounded-lg font-medium hover:opacity-90 transition-opacity"
@@ -86,7 +84,7 @@ function ChatGenerator() {
                         ))}
                     </div>
 
-                    {/* Input Field */}
+                    {}
                     <input
                         type="text"
                         value={prompt}
@@ -95,7 +93,7 @@ function ChatGenerator() {
                         className="w-full p-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
                     />
 
-                    {/* Chat Controls */}
+                    {}
                     <div className="flex space-x-2">
                         <button
                             onClick={askAi}
