@@ -6,6 +6,7 @@ function ChatGenerator() {
     const [chatHistory, setChatHistory] = useState([]);
     const [loading, setLoading] = useState(false);
     const [showHistory, setShowHistory] = useState(false);
+    const [selectedConversationId, setSelectedConversationId] = useState(null);
 
     useEffect(() => {
         fetchChatHistory();
@@ -15,9 +16,20 @@ function ChatGenerator() {
         try {
             const response = await fetch("http://localhost:8080/chatHistory");
             const data = await response.json();
-            setChatHistory(data.map(conv => JSON.parse(conv.messages)));
+            setChatHistory(data);
         } catch (error) {
             console.error("Error fetching chat history:", error);
+        }
+    };
+
+    const loadConversation = async (conversationId) => {
+        setSelectedConversationId(conversationId);
+        try {
+            const response = await fetch(`http://localhost:8080/conversation?conversationId=${conversationId}`);
+            const data = await response.json();
+            setConversation(JSON.parse(data.messages));
+        } catch (error) {
+            console.error("Error loading conversation:", error);
         }
     };
 
@@ -25,10 +37,14 @@ function ChatGenerator() {
         if (!prompt.trim()) return;
         setLoading(true);
         try {
-            const response = await fetch(`http://localhost:8080/response?message=${encodeURIComponent(prompt)}`);
+            const url = selectedConversationId
+                ? `http://localhost:8080/response?message=${encodeURIComponent(prompt)}&conversationId=${selectedConversationId}`
+                : `http://localhost:8080/response?message=${encodeURIComponent(prompt)}`;
+
+            const response = await fetch(url);
             const data = await response.text();
 
-            setConversation([...conversation, { user: prompt, bot: data }]);
+            setConversation([...conversation, `You: ${prompt}`, `Bot: ${data}`]);
             setPrompt('');
         } catch (error) {
             console.error("Error fetching response:", error);
@@ -41,13 +57,13 @@ function ChatGenerator() {
         alert("Conversation saved!");
         setConversation([]);
         fetchChatHistory();
+        setSelectedConversationId(null);
     };
 
     return (
         <div className="chat-container text-white p-6 bg-white/10 backdrop-blur-lg rounded-lg shadow-md">
             <h1 className="text-2xl font-semibold mb-4">Chat Bot</h1>
 
-            {}
             <button
                 onClick={() => setShowHistory(!showHistory)}
                 className="w-full bg-blue-600 text-white py-2 mb-4 rounded-lg font-medium hover:opacity-90 transition-opacity"
@@ -62,29 +78,41 @@ function ChatGenerator() {
                     ) : (
                         chatHistory.map((conv, index) => (
                             <div key={index} className="mb-6 p-4 bg-white/10 rounded-lg">
-                                <h3 className="text-blue-400 mb-2">Conversation {index + 1}</h3>
-                                {conv.map((msg, msgIndex) => (
+                                <h3 className="text-blue-400 mb-2">
+                                    Conversation {index + 1}
+                                    <button
+                                        onClick={() => loadConversation(conv.id)}
+                                        className="ml-2 text-sm text-blue-300 underline"
+                                    >
+                                        Continue
+                                    </button>
+                                </h3>
+                                {JSON.parse(conv.messages).slice(0, 3).map((msg, msgIndex) => (
                                     <p key={msgIndex} className={msg.startsWith("You:") ? "text-blue-300" : "text-green-300"}>
                                         {msg}
                                     </p>
                                 ))}
+                                {JSON.parse(conv.messages).length > 3 && <p className="text-gray-400">...</p>}
                             </div>
                         ))
                     )}
                 </div>
             ) : (
                 <>
-                    {/* Chat Conversation Area */}
+                    {selectedConversationId && (
+                        <p className="text-blue-300 mb-2">
+                            Continuing conversation #{selectedConversationId}
+                        </p>
+                    )}
+
                     <div className="chat-history max-h-96 overflow-y-auto p-4 mb-4 border border-white/10 rounded-lg bg-white/5">
-                        {conversation.map((chat, index) => (
-                            <div key={index} className="mb-4">
-                                <p className="text-blue-300"><strong>You:</strong> {chat.user}</p>
-                                <p className="text-green-300"><strong>Bot:</strong> {chat.bot}</p>
-                            </div>
+                        {conversation.map((msg, index) => (
+                            <p key={index} className={msg.startsWith("You:") ? "text-blue-300" : "text-green-300"}>
+                                {msg}
+                            </p>
                         ))}
                     </div>
 
-                    {}
                     <input
                         type="text"
                         value={prompt}
@@ -93,7 +121,6 @@ function ChatGenerator() {
                         className="w-full p-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
                     />
 
-                    {}
                     <div className="flex space-x-2">
                         <button
                             onClick={askAi}
